@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="An exploratory machine learning study on prioritizing content pages for human review using anonymized content-performance data.">
+  <title>Content Performance Analysis | ML Capstone</title>
+  <style>
+    :root {
+      --ink: #202b3c;
+      --muted: #617086;
+      --accent: #315b83;
+      --paper: #ffffff;
+      --background: #f3f6fa;
+      --line: #e1e7ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.7;
+    }
+
+    header {
+      background: #17283d;
+      color: white;
+      padding: 56px 22px;
+    }
+
+    .hero, main, footer {
+      max-width: 940px;
+      margin: auto;
+    }
+
+    header .eyebrow {
+      color: #b9d5f0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 44px);
+      line-height: 1.2;
+      margin: 12px 0;
+    }
+
+    header p { color: #dbe5f0; max-width: 720px; }
+
+    main { padding: 28px 18px 56px; }
+
+    section {
+      background: var(--paper);
+      padding: 28px;
+      margin: 18px 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(28, 44, 65, 0.035);
+    }
+
+    h2 {
+      font-size: 23px;
+      line-height: 1.3;
+      margin-top: 0;
+    }
+
+    h3 { font-size: 17px; margin-bottom: 6px; }
+
+    .muted { color: var(--muted); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      background: #f4f7fb;
+      border: 1px solid var(--line);
+      padding: 18px;
+      border-radius: 10px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 27px;
+      color: var(--accent);
+    }
+
+    .metric span { font-size: 13px; color: var(--muted); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th { background: #f4f7fb; }
+
+    .notice {
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      background: #f4f7fb;
+    }
+
+    a { color: var(--accent); }
+
+    footer {
+      padding: 0 22px 36px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      section { padding: 20px; }
+      th, td { padding: 8px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div class="eyebrow">Machine Learning Capstone</div>
+      <h1>Prioritizing Content Pages for Human Review</h1>
+      <p>An exploratory comparison of a rule-based baseline and a Random Forest classifier using anonymized content-performance data.</p>
+    </div>
+  </header>
+
+  <main>
+    <section id="abstract">
+      <h2>Abstract</h2>
+      <p>This project examines whether anonymized content-performance data can help content teams prioritize pages for human review. I compared a rule-based scoring baseline with a Random Forest classifier using a target derived from the existing <code>trend_direction</code> label. To evaluate performance on unseen clients, I used a client-grouped train-test split, with 25 clients in training and 7 in testing, and no client overlap. On the held-out test set, the Random Forest achieved an Average Precision of 0.5894, compared with 0.5008 for the rule-based baseline, an absolute improvement of 0.0886. These results suggest that the model may help rank pages with an observed declining trend for further investigation. However, the target represents an existing trend rather than future decline, and further validation is needed before practical use. The model should support human decision-making, not replace it.</p>
+    </section>
+
+    <section id="question">
+      <h2>1. Research Question</h2>
+      <p>Can available content-performance data help identify pages that may need attention, and can a simple scoring system help a content team decide which pages to review first?</p>
+      <p>Content teams may have thousands of pages but limited time. A ranked review queue can help analysts decide where to investigate first.</p>
+    </section>
+
+    <section id="data">
+      <h2>2. Data</h2>
+      <p>The analysis uses an anonymized content-performance dataset containing 30,000 rows and 44 columns. The main analysis includes pages with positive 90-day impressions and a content age of at least 90 days, with duplicate content IDs removed.</p>
+      <p>The target is derived from the existing <code>trend_direction</code> label: pages labelled “down” are marked as declining, while other labels are grouped as not declining. This target describes an existing trend, not a future outcome.</p>
+    </section>
+
+    <section id="methodology">
+      <h2>3. Methodology</h2>
+      <p>I compared a rule-based scoring baseline with a Random Forest classifier. Evaluation used a client-grouped train-test split so that clients in the test set were not present in training.</p>
+      <div class="metrics">
+        <div class="metric"><strong>25</strong><span>Training clients</span></div>
+        <div class="metric"><strong>7</strong><span>Unseen test clients</span></div>
+        <div class="metric"><strong>0</strong><span>Overlapping clients</span></div>
+      </div>
+      <p class="muted">Average Precision was used to compare how well the methods rank pages labelled as declining. A single grouped split does not establish performance across all clients or future periods.</p>
+    </section>
+
+    <section id="results">
+      <h2>4. Results</h2>
+      <p>On the client-grouped test set, the Random Forest achieved a higher Average Precision than the rule-based baseline.</p>
+      <table>
+        <thead><tr><th>Method</th><th>Average Precision</th></tr></thead>
+        <tbody>
+          <tr><td>Rule-based baseline</td><td>0.5008</td></tr>
+          <tr><td>Random Forest</td><td>0.5894</td></tr>
+        </tbody>
+      </table>
+      <div class="metrics">
+        <div class="metric"><strong>+0.0886</strong><span>Absolute improvement in Average Precision</span></div>
+        <div class="metric"><strong>0</strong><span>Clients shared between train and test</span></div>
+      </div>
+      <p>The result suggests that the Random Forest may be useful for ranking pages with an observed declining trend for further investigation. It does not establish that the model will forecast future decline.</p>
+    </section>
+
+    <section id="limitations">
+      <h2>5. Limitations</h2>
+      <ul>
+        <li>The target represents an existing trend, not a future decline outcome.</li>
+        <li>The evaluation uses one client-grouped train-test split.</li>
+        <li>Some performance features may describe the same period used to define the target, so they may not be suitable for future forecasting.</li>
+        <li>The baseline was designed to help prioritize review and may not have been optimized for the same classification task.</li>
+        <li>The analysis is observational and does not prove that changing content causes traffic or ranking improvements.</li>
+      </ul>
+    </section>
+
+    <section id="recommendations">
+      <h2>6. Ranked Recommendations</h2>
+      <ol>
+        <li>Use the model as an additional signal for prioritizing human review, not as an automatic decision-maker.</li>
+        <li>Inspect impressions, clicks, sessions, average position, content age, and search intent before selecting an action.</li>
+        <li>Match any content update to the issue identified by an analyst, rather than changing pages solely because of a model score.</li>
+        <li>Validate the approach on additional unseen clients or a later time period and collect reviewer feedback.</li>
+      </ol>
+      <p class="notice">A high score is a reason to investigate, not proof that a page will decline in the future.</p>
+    </section>
+
+    <section id="artifacts">
+      <h2>7. Artifacts and Reproducibility</h2>
+      <p>The companion notebook contains the analysis and validation code. The validation summary and comparison chart are generated as notebook artifacts.</p>
+      <p><a href="work/notebooks/capstone.ipynb">Open the capstone notebook on GitHub</a></p>
+      <p class="muted">The numerical results shown above are taken from the notebook's client-grouped evaluation.</p>
+    </section>
+
+    <section id="closing">
+      <h2>Closing Deliverables</h2>
+      <h3>Five-minute demo outline</h3>
+      <ol>
+        <li>Research question and review prioritization problem.</li>
+        <li>Dataset and existing-trend target.</li>
+        <li>Baseline, Random Forest, and client-grouped validation.</li>
+        <li>Average Precision results and comparison.</li>
+        <li>Limitations and responsible decision-support use.</li>
+      </ol>
+
+      <h3>Social-post version</h3>
+      <p>I explored whether machine learning can help content teams prioritize pages for review using anonymized content-performance data. On a client-grouped test set, a Random Forest achieved an Average Precision of 0.5894, compared with 0.5008 for a rule-based baseline. The findings suggest potential value as a decision-support tool, but further validation is needed. The model identifies an existing trend rather than predicting future decline.</p>
+
+      <h3>Employer-facing summary</h3>
+      <p>I compared a rule-based baseline with a Random Forest classifier using anonymized content-performance data. With 25 training clients and 7 unseen test clients, the Random Forest achieved an Average Precision of 0.5894 versus 0.5008 for the baseline. I documented the validation approach, limitations, and potential use as a human-review prioritization aid rather than a proven future-forecasting system.</p>
+    </section>
+
+    <section id="acknowledgments">
+      <h2>8. Acknowledgments &amp; Data Credit</h2>
+      <p>This project was completed as part of the FlyRank AI ML internship assignment. I acknowledge FlyRank for providing the internship framework, research context, and anonymized content-performance dataset used in this analysis.</p>
+      <p>For more information, visit <a href="https://flyrank.ai">FlyRank</a>.</p>
+      <p>The findings are exploratory and observational. They should not be interpreted as evidence of causal effects or guaranteed future performance.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Machine Learning Capstone · Content-performance analysis · Decision support, not automated decision-making.</p>
+  </footer>
+</body>
+</html>
